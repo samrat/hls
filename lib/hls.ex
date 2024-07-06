@@ -1,4 +1,4 @@
-defmodule HLS do
+defmodule HLS2 do
   @moduledoc "README.md"
              |> File.read!()
              |> String.split("<!-- MDOC !-->")

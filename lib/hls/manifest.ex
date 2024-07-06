@@ -15,6 +15,7 @@ defmodule HLS.Manifest do
     :independent_segments,
     :start,
     :target_duration,
+    :map,
     :media_sequence,
     :discontinuity_sequence,
     :end_list,
@@ -46,6 +47,16 @@ defmodule HLS.Manifest do
     |> put_image_renditions()
     |> put_i_frame_renditions()
     |> put_segments()
+    |> put_map()
+  end
+
+  defp put_map(%{lines: lines} = manifest) do
+    map =
+      lines
+      |> Enum.find(&(&1.tag_name == "EXT-X-MAP"))
+      |> then(&if &1, do: Map.get(&1, :value))
+
+    %{manifest | map: map}
   end
 
   # Loops over the lines and chunks the related lines together into a list. Each
@@ -114,7 +125,7 @@ defmodule HLS.Manifest do
     segments =
       lines
       |> accumulate(&HLS.M3ULine.segment_tag_line?/1, &HLS.M3ULine.uri_line?/1)
-      |> Enum.map(&HLS.Segment.build/1)
+      |> Enum.map(&HLS.Segment2.build/1)
 
     %{manifest | segments: segments}
   end

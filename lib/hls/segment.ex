@@ -1,4 +1,5 @@
-defmodule HLS.Segment do
+defmodule HLS.Segment2 do
+  # NOTE: Named this way because this module clashes with `kim_hls`. Argh!!
   require Logger
 
   # These attributes are enum and all caps without quotes
@@ -48,7 +49,7 @@ defmodule HLS.Segment do
   end
 
   @doc """
-  Given a key and value, correctly serializes the attribute into 
+  Given a key and value, correctly serializes the attribute into
   a KEY=value string, respecting the spec for which keys should
   or should not be quoted.
 
@@ -77,7 +78,7 @@ defmodule HLS.Segment do
     |> do_serialize_attributes()
   end
 
-  # This writes the attributes to a map in the order that 
+  # This writes the attributes to a map in the order that
   # the RFC specifies.
   defp do_serialize_attributes(attribute_map) do
     @attribute_order

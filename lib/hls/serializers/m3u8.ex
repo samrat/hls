@@ -10,6 +10,7 @@ defmodule HLS.Serializers.M3U8 do
     |> String.trim()
     |> maybe_insert_version(manifest)
     |> maybe_insert_media_sequence(manifest)
+    |> maybe_insert_map(manifest)
     |> maybe_insert_images_only(manifest)
     |> maybe_insert_independent_segments(manifest)
     |> maybe_insert_target_duration(manifest)
@@ -37,6 +38,9 @@ defmodule HLS.Serializers.M3U8 do
   defp maybe_insert_media_sequence(content, %HLS.Manifest{media_sequence: media_sequence}) do
     content <> "\n#EXT-X-MEDIA-SEQUENCE:#{media_sequence}"
   end
+
+  defp maybe_insert_map(content, %HLS.Manifest{map: nil}), do: content
+  defp maybe_insert_map(content, %HLS.Manifest{map: map}), do: content <> "\n#EXT-X-MAP:#{map}"
 
   defp maybe_insert_images_only(content, %HLS.Manifest{images_only: true}) do
     content <> "\n#EXT-X-IMAGES-ONLY"
@@ -154,23 +158,23 @@ defmodule HLS.Serializers.M3U8 do
     end
   end
 
-  defp maybe_insert_byte_range(content, %HLS.Segment{byte_range: nil}), do: content
+  defp maybe_insert_byte_range(content, %HLS.Segment2{byte_range: nil}), do: content
 
-  defp maybe_insert_byte_range(content, %HLS.Segment{byte_range: byte_string}) do
+  defp maybe_insert_byte_range(content, %HLS.Segment2{byte_range: byte_string}) do
     content <> "#EXT-X-BYTERANGE:#{byte_string}\n"
   end
 
-  defp maybe_insert_tiles(content, %HLS.Segment{tiles: nil}), do: content
+  defp maybe_insert_tiles(content, %HLS.Segment2{tiles: nil}), do: content
 
-  defp maybe_insert_tiles(content, %HLS.Segment{tiles: %HLS.Segment.Tiles{} = tiles}) do
+  defp maybe_insert_tiles(content, %HLS.Segment2{tiles: %HLS.Segment.Tiles{} = tiles}) do
     content <> "#{HLS.Segment.Tiles.serialize(tiles)}\n"
   end
 
-  defp maybe_prepend_program_date_time(string, %HLS.Segment{program_date_time: nil}) do
+  defp maybe_prepend_program_date_time(string, %HLS.Segment2{program_date_time: nil}) do
     string
   end
 
-  defp maybe_prepend_program_date_time(string, %HLS.Segment{program_date_time: date}) do
+  defp maybe_prepend_program_date_time(string, %HLS.Segment2{program_date_time: date}) do
     "#EXT-X-PROGRAM-DATE-TIME:#{date}\n" <> string
   end
 
